@@ -1,0 +1,6 @@
+@echo off
+echo compiling lah pls wait a bit...
+g++ main.cpp common.cpp module1_member.cpp module2_book.cpp module3_loan.cpp module4_fine.cpp -o lms.exe
+echo Compilation successful! Starting the system...
+lms.exe
+pause
