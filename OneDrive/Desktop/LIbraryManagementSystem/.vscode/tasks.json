@@ -1,0 +1,30 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build LMS",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-std=c++17",
+                "-Wall",
+                "-g",
+                "${workspaceFolder}\\main.cpp",
+                "${workspaceFolder}\\common.cpp",
+                "${workspaceFolder}\\module1_member.cpp",
+                "${workspaceFolder}\\module2_book.cpp",
+                "${workspaceFolder}\\module3_loan.cpp",
+                "${workspaceFolder}\\module4_fine.cpp",
+                "-o",
+                "${workspaceFolder}\\lms.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}
