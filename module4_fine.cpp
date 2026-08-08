@@ -1,4 +1,5 @@
 #include "common.h"
+#include <cmath>
 
 // Module 4 - Fine Payment Processing & Reporting - ang zi chen
 
@@ -63,4 +64,24 @@ void fineMenu(vector<Fine>& fines, vector<Loan>& loans,
                 break;
         }
     } while (choice != 0);
+}
+
+// Rounds a money value to 2 decimal places
+double money2dp(double value) {
+    return round(value * 100.0) / 100.0;
+}
+
+// Rebuilds a member's outstandingFine from the fine records.
+void recalcMemberOutstanding(vector<Member>& members,
+                             const vector<Fine>& fines, int memID) {
+    int mi = findMemberIndexAny(members, memID);
+    if (mi == -1) return;
+
+    double total = 0.0;
+    for (int i = 0; i < (int)fines.size(); i++) {
+        if (fines[i].memID == memID && !fines[i].settled) {
+            total += fineBalance(fines[i]);
+        }
+    }
+    members[mi].outstandingFine = money2dp(total);
 }
