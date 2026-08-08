@@ -6,7 +6,7 @@
 void fineMenu(vector<Fine>& fines, vector<Loan>& loans,
               vector<Member>& members, vector<Book>& books) {
     int choice;
- 
+
     do {
         printHeader("FINE PAYMENT & REPORTING");
         cout << "  1. Calculate Overdue Fine\n";
@@ -17,48 +17,30 @@ void fineMenu(vector<Fine>& fines, vector<Loan>& loans,
         cout << "  6. Overdue Member Report\n";
         cout << "  7. Monthly Statistics Report\n";
         cout << "  0. Back to Main Menu\n\n";
- 
+
         choice = readInt("Enter choice: ", 0, 7);
- 
+
         switch (choice) {
             case 1:
-                // TODO: calcFine(daysOverdue, FINE_PER_DAY, FINE_CAP)
-                //       then multiply by getFineRate(member.tier)
-                cout << "\n  [Module 4] calcFine() not implemented yet.";
-                pressEnterToContinue();
+                viewOverdueFine(loans, members, books);
                 break;
             case 2:
-                // TODO: processPayment(...)
-                //   - update f.paid; settled = (fineBalance(f) == 0)
-                //   - update member.outstandingFine to match
-                //   - monthlyStats[month-1][book.category] += amountPaid
-                cout << "\n  [Module 4] processPayment() not implemented yet.";
-                pressEnterToContinue();
+                payFineFunction(fines, members, loans, books);
                 break;
             case 3:
-                // TODO: printReceipt(f, m, b);
-                cout << "\n  [Module 4] printReceipt() not implemented yet.";
-                pressEnterToContinue();
+                receiptFunction(fines, members, loans, books);
                 break;
             case 4:
-                // TODO: fineCollectionReport(fines);
-                cout << "\n  [Module 4] fineCollectionReport() not implemented yet.";
-                pressEnterToContinue();
+                fineCollectionReport(fines, members);
                 break;
             case 5:
-                // TODO: mostBorrowedReport(books, borrowCount);
-                cout << "\n  [Module 4] mostBorrowedReport() not implemented yet.";
-                pressEnterToContinue();
+                mostBorrowedReport(books, borrowCount);
                 break;
             case 6:
-                // TODO: overdueMemberReport(members, loans, systemDate);
-                cout << "\n  [Module 4] overdueMemberReport() not implemented yet.";
-                pressEnterToContinue();
+                overdueMemberReport(members, loans, books);
                 break;
             case 7:
-                // TODO: monthlyStatisticsReport(monthlyStats);
-                cout << "\n  [Module 4] monthlyStatisticsReport() not implemented yet.";
-                pressEnterToContinue();
+                monthlyStatisticsReport(monthlyStats);
                 break;
             case 0:
                 break;
@@ -66,6 +48,18 @@ void fineMenu(vector<Fine>& fines, vector<Loan>& loans,
     } while (choice != 0);
 }
 
+void viewOverdueFine(const vector<Loan>& loans,
+                     const vector<Member>& members,
+                     const vector<Book>& books);
+void receiptFunction(const vector<Fine>& fines, const vector<Member>& members,
+                     const vector<Loan>& loans, const vector<Book>& books);
+void fineCollectionReport(const vector<Fine>& fines,
+                          const vector<Member>& members);
+void mostBorrowedReport(const vector<Book>& books, const int borrowCnt[]);
+void overdueMemberReport(const vector<Member>& members,
+                         const vector<Loan>& loans,
+                         const vector<Book>& books);
+void monthlyStatisticsReport(const double stats[][MAX_CATEGORIES]);
 // Rounds a money value to 2 decimal places
 // A double cannot store 0.30 exactly, so after several part
 // payments a fully-paid fine could be left with a balance of
