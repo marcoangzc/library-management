@@ -320,7 +320,7 @@ void calculateOverdueFine(vector<Fine>& fines,
          << " : RM " << cappedFine << '\n';
 
     cout << left << setw(22) << "  Tier Rate"
-         << " : " << rate << '\n';
+         << " : x" << rate << '\n';
 
     cout << left << setw(22) << "  Final Fine"
          << " : RM " << finalFine << '\n';
@@ -611,6 +611,15 @@ void receiptFunction(const vector<Fine>& fines,
         return;
     }
 
+    // A receipt is proof of payment - nothing to print before any money
+    // has been received.
+    if (fines[fi].paid <= 0.0) {
+        cout << "\n  No payment has been made on this fine yet.";
+        cout << "\n  A receipt can only be printed after a payment.";
+        pressEnterToContinue();
+        return;
+    }
+
     int mi = findMemberIndexAny(members, fines[fi].memID);
     int li = findLoanIndex(loans, fines[fi].loanID);
     int bi = -1;
@@ -664,7 +673,7 @@ void receiptFunction(const vector<Fine>& fines,
          << " : " << fines[fi].daysOverdue << '\n';
 
     cout << left << setw(20) << "Fine Rate"
-         << " : " << rate << '\n';
+         << " : x" << rate << " (tier multiplier)" << '\n';
 
     cout << left << setw(20) << "Fine Amount"
          << " : RM " << fines[fi].amount << '\n';
