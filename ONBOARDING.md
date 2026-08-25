@@ -762,6 +762,8 @@ git push                        # ⑤ 上传 GitHub
 | 输错类型后疯狂刷提示 | readXxx 的 while 校验循环在工作；交互模式下正常重试，管道喂错输入才会刷屏 |
 | getline 被"跳过" | readInt 内部已经吃掉了换行符，别再手动 `cin.ignore()`（M1 真实事故，曾要多按一次回车） |
 | 表格歪了 | 内容超过 setw 给的宽度；长名字截断用 `.substr(0, n)` |
+| 双击 lms.exe 弹窗 `libstdc++-6.dll was not found` | 电脑没装 g++ 时，动态链接的 exe 找不到 MinGW 运行库。仓库里的 lms.exe 已改用 `-static` **静态编译**——运行库打包进了 exe 本体，任何 Windows 10/11 直接双击即可；run.bat 也加了同样的参数，自己编译出来的 exe 同样随处可跑。若还遇到，先 `git pull` 拿最新 exe |
+| VS Code 里有红色波浪线，但 g++ 编译能通过 | 波浪线来自 IntelliSense（编辑器的实时语法检查），**不是编译错误**。若 `.vscode/c_cpp_properties.json` 里的 compilerPath（`C:/msys64/...`）在你电脑上不存在，它会退回 MSVC 规则、挑剔 GCC 专属语法。一切以 `g++` 编译结果为准；装好 MSYS2（§2.1）后波浪线自动消失。源码已全部改为标准 C++ 写法，两边都不再报警 |
 
 ### 13.3 演示前 Checklist
 
