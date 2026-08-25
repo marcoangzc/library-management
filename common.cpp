@@ -486,7 +486,7 @@ void seedData(vector<Member>& members, vector<Book>& books,
     // A completed loan that was returned late - this is the loan the
     // outstanding fine record below refers to.
     Loan returned = makeLoan(5000, 1004, 2006, d0, 0, LOAN_RETURNED);
-    returned.returnDate = (Date){ 30, 6, 2026 };
+    returned.returnDate = Date{ 30, 6, 2026 };   // standard C++ brace init
     loans.push_back(returned);
  
     loans.push_back(makeLoan(5001, 1001, 2001, d1, 0, LOAN_ISSUED));
