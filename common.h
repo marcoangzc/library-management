@@ -213,7 +213,8 @@ void seedData(vector<Member>& members, vector<Book>& books,
 void memberManagementMenu(vector<Member>& members,
                           const vector<Loan>& loans);// Module 1
  
-void bookCatalogueMenu(vector<Book>& books); // Module 2
+void bookCatalogueMenu(vector<Book>& books,
+                       const vector<Member>& members); // Module 2
  
 void loanMenu(vector<Loan>& loans, vector<Book>& books,
               vector<Member>& members, vector<Fine>& fines);// Module 3

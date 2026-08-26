@@ -23,13 +23,15 @@ void   removeBook(vector<Book>& books);
 void   displayCatalogue(const vector<Book>& books);
 void   displayAvailability(const vector<Book>& books);
 void   displayShelfMap();
+void   recommendBooksForMember(const vector<Book>& books,
+                               const vector<Member>& members);
 
 int    findDuplicateISBN(const vector<Book>& books, const string& isbn, int skipIndex);
 int    countByCategory(const vector<Book>& books, int category);
 string locationText(Book b);        // pass-by-value: the function only reads
 void   printSearchHeader();
 
-void bookCatalogueMenu(vector<Book>& books) {
+void bookCatalogueMenu(vector<Book>& books, const vector<Member>& members) {
     int choice;
 
     do {
@@ -42,9 +44,10 @@ void bookCatalogueMenu(vector<Book>& books) {
         cout << "  6. Remove Title\n";
         cout << "  7. Display Catalogue\n";
         cout << "  8. Display Availability Listing\n";
+        cout << "  9. Recommend Books for a Member\n";
         cout << "  0. Back to Main Menu\n\n";
 
-        choice = readInt("Enter choice: ", 0, 8);
+        choice = readInt("Enter choice: ", 0, 9);
 
         switch (choice) {
             case 1:
@@ -77,6 +80,10 @@ void bookCatalogueMenu(vector<Book>& books) {
                 break;
             case 8:
                 displayAvailability(books);
+                pressEnterToContinue();
+                break;
+            case 9:
+                recommendBooksForMember(books, members);
                 pressEnterToContinue();
                 break;
             case 0:
@@ -595,4 +602,124 @@ void displayShelfMap() {
         if (!any) cout << "(empty)";
         cout << '\n';
     }
+}
+
+// EXTRA FUNCTION - personalised book recommendation list.
+//
+// The system records how many books of each category a member has ever
+// borrowed in the shared 2D array memberLoanHistory[memberIndex][category]
+// (written by Module 3 on every issue). This function finds the member's
+// favourite category and recommends the most-popular active titles from
+// that category, ranked by the global borrow count. Members without any
+// history get the overall most-borrowed titles instead.
+void recommendBooksForMember(const vector<Book>& books,
+                             const vector<Member>& members) {
+    printHeader("BOOK RECOMMENDATIONS");
+
+    int mi;
+    while (true) {                                   // while: re-prompt until valid
+        int id = readInt("  Member ID (0 to cancel): ");
+        if (id == 0) return;
+
+        mi = findMemberIndex(members, id);
+        if (mi != -1) break;
+
+        cout << "  >> Member Not Found.\n";
+    }
+
+    // ---- step 1: find the favourite category from the 2D history array ----
+    int bestCategory = -1;
+    int bestCount    = 0;
+    int totalRead    = 0;
+
+    for (int c = 0; c < MAX_CATEGORIES; c++) {       // scan one row of the 2D array
+        int borrowed = memberLoanHistory[mi][c];
+        totalRead += borrowed;
+
+        if (borrowed > bestCount) {
+            bestCount    = borrowed;
+            bestCategory = c;
+        }
+    }
+
+    cout << "\n  Member : " << members[mi].memID << " - "
+         << members[mi].name << '\n';
+
+    if (bestCategory == -1) {
+        // New member with no borrowing history - fall back to the
+        // library-wide popularity ranking.
+        cout << "  No borrowing history yet - showing the library-wide"
+             << " most-borrowed titles instead.\n";
+        bestCategory = -2;                           // marker: no category filter
+    } else {
+        cout << "  Favourite category: " << CATEGORY_NAME[bestCategory]
+             << " (" << bestCount << " of " << totalRead << " books read)\n";
+    }
+
+    // ---- step 2: collect candidate titles ----
+    int candidates[MAX_BOOKS];
+    int nCandidates = 0;
+
+    for (int i = 0; i < (int)books.size(); i++) {
+        if (!books[i].active) continue;
+
+        if (bestCategory >= 0 && books[i].category != bestCategory)
+            continue;
+
+        candidates[nCandidates++] = i;
+    }
+
+    if (nCandidates == 0) {
+        cout << "\n  No titles left in this category."
+             << " Try another category or check the catalogue!\n";
+        return;
+    }
+
+    // ---- step 3: rank by borrow count (selection on a parallel array) ----
+    int limit = (nCandidates < 5) ? nCandidates : 5;
+
+    cout << "\n" << left
+         << setw(6)  << "Rank"
+         << setw(8)  << "BookID"
+         << setw(34) << "Title"
+         << setw(15) << "Category"
+         << right
+         << setw(10) << "Borrows"
+         << setw(12) << "Available"
+         << '\n';
+    printRule();
+
+    for (int rank = 0; rank < limit; rank++) {
+        int best = -1;
+
+        for (int i = 0; i < nCandidates; i++) {
+            if (candidates[i] == -1) continue;       // already ranked
+
+            if (best == -1 ||
+                borrowCount[candidates[i]] > borrowCount[candidates[best]])
+                best = i;
+        }
+
+        int bi = candidates[best];
+        candidates[best] = -1;                       // remove from pool
+
+        string category = (books[bi].category >= 0 &&
+                           books[bi].category < MAX_CATEGORIES)
+                        ? CATEGORY_NAME[books[bi].category] : "Unknown";
+
+        cout << left
+             << setw(6)  << rank + 1
+             << setw(8)  << books[bi].bookID
+             << setw(34) << books[bi].title.substr(0, 33)
+             << setw(15) << category.substr(0, 14)
+             << right
+             << setw(10) << borrowCount[bi]
+             << setw(10) << books[bi].availableCopies
+             << (books[bi].availableCopies > 0 ? " copies" : " (reserve)")
+             << '\n';
+    }
+
+    printRule();
+    cout << "  Ranked by total borrows. Titles marked (reserve) are all on"
+         << " loan - reserve them from menu 3-4.\n";
 }

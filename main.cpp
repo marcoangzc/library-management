@@ -41,7 +41,7 @@ int main() {
                 memberManagementMenu(members, loans);
                 break;
             case 2:
-                bookCatalogueMenu(books);
+                bookCatalogueMenu(books, members);
                 break;
             case 3:
                 loanMenu(loans, books, members, fines);

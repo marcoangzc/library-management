@@ -17,6 +17,7 @@ void   suspendMember(vector<Member>& members);
 void   deleteMember(vector<Member>& members);
 void   displayAllMembers(const vector<Member>& members);
 void   displayMemberCard(const vector<Member>& members, const vector<Loan>& loans);
+void   displayTierPrivileges();
 
 bool   validateName(const string& name);
 bool   validatePhone(const string& phone);
@@ -35,9 +36,10 @@ void memberManagementMenu(vector<Member>& members, const vector<Loan>& loans) {
         cout << "  5. Delete Member\n";
         cout << "  6. Display All Members\n";
         cout << "  7. Display Member Record Card\n";
+        cout << "  8. Membership Privileges\n";
         cout << "  0. Back to Main Menu\n\n";
 
-        choice = readInt("Enter choice: ", 0, 7);
+        choice = readInt("Enter choice: ", 0, 8);
 
         switch (choice) {
             case 1:
@@ -66,6 +68,10 @@ void memberManagementMenu(vector<Member>& members, const vector<Loan>& loans) {
                 break;
             case 7:
                 displayMemberCard(members, loans);
+                pressEnterToContinue();
+                break;
+            case 8:
+                displayTierPrivileges();
                 pressEnterToContinue();
                 break;
             case 0:
@@ -443,4 +449,49 @@ void displayMemberCard(const vector<Member>& members, const vector<Loan>& loans)
     if (loanCount == 0) cout << "   (none)\n";
 
     cout << "  -----------------------------------------\n";
+}
+
+// EXTRA FUNCTION - membership tier privileges.
+// One screen that shows what each tier is entitled to. The numbers come
+// straight from the shared look-up functions, so this table can never go
+// out of step with the rules the other modules actually enforce.
+void displayTierPrivileges() {
+    const char TIERS[3] = { TIER_STUDENT, TIER_STAFF, TIER_PREMIUM };
+
+    printHeader("MEMBERSHIP PRIVILEGES");
+
+    cout << "\n" << left
+         << setw(10) << "Tier"
+         << setw(12) << "Code"
+         << right
+         << setw(16) << "Borrow Limit"
+         << setw(16) << "Fine Rate"
+         << '\n';
+    printRule();
+
+    for (int i = 0; i < 3; i++) {
+        char t = TIERS[i];
+
+        cout << left
+             << setw(10) << getTierName(t)
+             << setw(12) << t
+             << right
+             << setw(13) << getBorrowLimit(t) << " books"
+             << setw(13) << getFineRate(t) << " x"
+             << '\n';
+    }
+
+    printRule();
+
+    cout << fixed << setprecision(2);
+    cout << "\n  How the privileges are applied by the system:\n\n";
+    cout << "  - Borrow limit : checked before every loan (option 3-1).\n"
+         << "    A member at the limit sees \"Borrowing limit for this tier reached.\"\n";
+    cout << "  - Fine rate    : multiplies the overdue fine when a late book\n"
+         << "    is returned. Example: 13 days late = RM "
+         << 13 * FINE_PER_DAY << " base fine,\n"
+         << "    a STAFF member pays half (RM " << 13 * FINE_PER_DAY * RATE_STAFF
+         << "), a PREMIUM member pays nothing.\n";
+    cout << "  - Fines are capped at RM " << FINE_CAP
+         << " before the tier rate is applied.\n";
 }
